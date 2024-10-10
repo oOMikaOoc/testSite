@@ -12,8 +12,9 @@
             margin: 0;
             padding: 0;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
         }
 
@@ -67,6 +68,14 @@
         h3 {
             color: #3498db;
         }
+
+        /* Ajouter un style pour l'interface de scan */
+        #barcodeScannerArea {
+            width: 100%;
+            height: 300px;
+            border: 2px solid #ccc;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -83,7 +92,8 @@
         <!-- Bouton pour lancer la recherche -->
         <button id="searchBtn">Rechercher</button>
 
-        <!-- Bouton pour lancer le scan de code-barres -->
+        <!-- Interface pour scanner le code-barres -->
+        <div id="barcodeScannerArea"></div>
         <button id="scanBtn">Scanner le code-barres</button>
         <p id="barcodeResult">Code-barres scanné ou saisi: </p>
 
@@ -92,8 +102,4 @@
     </div>
 
     <!-- Charger la bibliothèque PapaParse pour lire les fichiers CSV et QuaggaJS pour scanner -->
-    <script src="https://unpkg.com/quagga@0.12.1/dist/quagga.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    <script src="app.js"></script>
-</body>
-</html>
+    <script src="https://unpkg.com/quagga@0.12.1/dist/quagga.min.js"></script

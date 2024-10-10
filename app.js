@@ -1,13 +1,29 @@
-// Fonction pour démarrer le scan de code-barres
+// Fonction pour démarrer le scan de code-barres avec une interface améliorée
 document.getElementById('scanBtn').addEventListener('click', function() {
     Quagga.init({
         inputStream: {
             name: "Live",
             type: "LiveStream",
-            target: document.querySelector('#barcodeResult')    // élément où le flux vidéo s'affiche
+            target: document.querySelector('#barcodeScannerArea'),  // L'élément HTML où le flux vidéo sera affiché
+            constraints: {
+                width: 640,
+                height: 480,
+                facingMode: "environment"  // Utiliser la caméra arrière sur les appareils mobiles
+            }
         },
         decoder: {
-            readers: ["code_128_reader", "ean_reader", "ean_8_reader", "code_39_reader", "code_39_vin_reader"]
+            readers: ["code_128_reader", "ean_reader", "ean_8_reader", "code_39_reader"]
+        },
+        locate: true,  // Activer la détection automatique de localisation du code-barres
+        locator: {
+            halfSample: true,
+            patchSize: "medium",  // Taille moyenne pour l'algorithme de localisation
+            debug: {
+                showCanvas: false,
+                showPatches: false,
+                showFoundPatches: false,
+                showSkeleton: false
+            }
         }
     }, function(err) {
         if (err) {
@@ -21,10 +37,11 @@ document.getElementById('scanBtn').addEventListener('click', function() {
         let code = result.codeResult.code;
         document.getElementById('barcodeResult').innerText = "Code-barres scanné : " + code;
         searchCSV(code);
+        Quagga.stop();  // Arrêter le scan après détection
     });
 });
 
-// Fonction pour rechercher un terme dans le CSV et afficher les informations de manière formatée
+// Fonction pour rechercher un terme dans le CSV et afficher les informations
 function searchCSV(term) {
     if (!window.csvData) {
         document.getElementById('csvResult').innerText = "Veuillez d'abord sélectionner un fichier CSV.";
@@ -65,7 +82,7 @@ document.getElementById('searchBtn').addEventListener('click', function() {
     }
 });
 
-// Fonction pour lire le fichier CSV sélectionné ou charger un fichier par défaut
+// Fonction pour lire le fichier CSV sélectionné
 document.getElementById('csvFileInput').addEventListener('change', function(event) {
     let file = event.target.files[0];
     if (file) {
