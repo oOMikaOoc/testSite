@@ -1,16 +1,25 @@
 // Fonction pour démarrer le scan de code-barres avec ZXing
 document.getElementById('scanBtn').addEventListener('click', function() {
-    const codeReader = new ZXing.BrowserBarcodeReader();
-    codeReader.getVideoInputDevices().then(videoInputDevices => {
-        const firstDeviceId = videoInputDevices[0].deviceId;
+    // Demander explicitement l'accès à la caméra
+    navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+        const codeReader = new ZXing.BrowserBarcodeReader();
 
-        // Utiliser la première caméra trouvée (ou arrière sur mobile)
-        codeReader.decodeOnceFromVideoDevice(firstDeviceId, 'barcodeScannerArea').then(result => {
-            document.getElementById('barcodeResult').innerText = "Code-barres scanné : " + result.text;
-            searchCSV(result.text);  // Recherche dans le CSV après le scan
-        }).catch(err => console.error(err));
+        // Récupérer les périphériques vidéo
+        codeReader.getVideoInputDevices().then(videoInputDevices => {
+            const firstDeviceId = videoInputDevices[0].deviceId;
+
+            // Utiliser la première caméra détectée
+            codeReader.decodeOnceFromVideoDevice(firstDeviceId, 'barcodeScannerArea').then(result => {
+                document.getElementById('barcodeResult').innerText = "Code-barres scanné : " + result.text;
+                searchCSV(result.text);  // Recherche dans le CSV après le scan
+            }).catch(err => console.error("Erreur lors du scan :", err));
+        });
+    }).catch(function(err) {
+        console.error("Accès à la caméra refusé :", err);
+        document.getElementById('barcodeResult').innerText = "Erreur : Accès à la caméra refusé.";
     });
 });
+
 
 // Fonction de recherche dans le CSV pour afficher les résultats formatés
 function searchCSV(term) {
