@@ -1,25 +1,34 @@
 // Fonction pour démarrer le scan de code-barres avec ZXing
 document.getElementById('scanBtn').addEventListener('click', function() {
-    alert("Périphériques vidéo détectés : " + JSON.stringify(videoInputDevices));
     // Demander explicitement l'accès à la caméra
     navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
         const codeReader = new ZXing.BrowserBarcodeReader();
 
         // Récupérer les périphériques vidéo
         codeReader.getVideoInputDevices().then(videoInputDevices => {
-            const firstDeviceId = videoInputDevices[0].deviceId;
+            // Afficher les périphériques vidéo détectés dans une alerte
+            alert("Périphériques vidéo détectés : " + JSON.stringify(videoInputDevices));
 
-            // Utiliser la première caméra détectée
-            codeReader.decodeOnceFromVideoDevice(firstDeviceId, 'barcodeScannerArea').then(result => {
-                document.getElementById('barcodeResult').innerText = "Code-barres scanné : " + result.text;
-                searchCSV(result.text);  // Recherche dans le CSV après le scan
-            }).catch(err => console.error("Erreur lors du scan :", err));
+            if (videoInputDevices.length > 0) {
+                const firstDeviceId = videoInputDevices[0].deviceId;
+
+                // Utiliser la première caméra détectée
+                codeReader.decodeOnceFromVideoDevice(firstDeviceId, 'barcodeScannerArea').then(result => {
+                    document.getElementById('barcodeResult').innerText = "Code-barres scanné : " + result.text;
+                    searchCSV(result.text);  // Recherche dans le CSV après le scan
+                }).catch(err => console.error("Erreur lors du scan :", err));
+            } else {
+                alert("Aucun périphérique vidéo trouvé.");
+            }
+        }).catch(err => {
+            console.error("Erreur lors de la récupération des périphériques vidéo :", err);
         });
     }).catch(function(err) {
         console.error("Accès à la caméra refusé :", err);
         document.getElementById('barcodeResult').innerText = "Erreur : Accès à la caméra refusé.";
     });
 });
+
 
 
 // Fonction de recherche dans le CSV pour afficher les résultats formatés
