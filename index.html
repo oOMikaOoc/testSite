@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code-barres CSV Reader</title>
+</head>
+<body>
+    <h1>Scanner un code-barres et lire le CSV</h1>
+
+    <!-- Bouton pour lancer le scan de code-barres -->
+    <button id="scanBtn">Scanner le code-barres</button>
+    <p id="barcodeResult">Code-barres: </p>
+
+    <!-- Sélecteur de fichier CSV -->
+    <input type="file" id="csvFileInput" accept=".csv">
+    <p id="csvResult">Résultat CSV: </p>
+
+    <!-- Zone pour afficher les résultats -->
+    <div id="result"></div>
+
+    <!-- Charger les bibliothèques JavaScript -->
+    <script src="https://unpkg.com/quagga@0.12.1/dist/quagga.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    
+    <script src="app.js"></script>
+</body>
+</html>
