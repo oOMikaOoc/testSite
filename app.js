@@ -6,10 +6,10 @@ document.getElementById('scanBtn').addEventListener('click', function() {
 
         // Récupérer les périphériques vidéo
         codeReader.getVideoInputDevices().then(videoInputDevices => {
-            // Afficher les périphériques vidéo détectés dans une alerte
-            alert("Périphériques vidéo détectés : " + JSON.stringify(videoInputDevices));
-
             if (videoInputDevices.length > 0) {
+                // Afficher les périphériques vidéo détectés
+                alert("Périphériques vidéo détectés : " + JSON.stringify(videoInputDevices));
+                
                 const firstDeviceId = videoInputDevices[0].deviceId;
 
                 // Utiliser la première caméra détectée
@@ -19,15 +19,18 @@ document.getElementById('scanBtn').addEventListener('click', function() {
                 }).catch(err => console.error("Erreur lors du scan :", err));
             } else {
                 alert("Aucun périphérique vidéo trouvé.");
+                document.getElementById('barcodeResult').innerText = "Erreur : Aucun périphérique vidéo trouvé.";
             }
         }).catch(err => {
             console.error("Erreur lors de la récupération des périphériques vidéo :", err);
+            document.getElementById('barcodeResult').innerText = "Erreur : Récupération des périphériques vidéo échouée.";
         });
     }).catch(function(err) {
         console.error("Accès à la caméra refusé :", err);
-        document.getElementById('barcodeResult').innerText = "Erreur : Accès à la caméra refusé.";
+        document.getElementById('barcodeResult').innerText = "Erreur : Accès à la caméra refusé ou aucun périphérique trouvé.";
     });
 });
+
 
 
 
