@@ -1,30 +1,18 @@
-// Fonction pour démarrer le scan de code-barres avec une interface améliorée
+// Fonction pour démarrer le scan de code-barres
 document.getElementById('scanBtn').addEventListener('click', function() {
     Quagga.init({
         inputStream: {
             name: "Live",
             type: "LiveStream",
-            target: document.querySelector('#barcodeScannerArea'),  // L'élément HTML où le flux vidéo sera affiché
+            target: document.querySelector('#barcodeScannerArea'),
             constraints: {
-                width: 640,
-                height: 480,
-                facingMode: "environment"  // Utiliser la caméra arrière sur les appareils mobiles
+                facingMode: "environment"  // Utiliser la caméra arrière pour une meilleure qualité de scan
             }
         },
         decoder: {
-            readers: ["code_128_reader", "ean_reader", "ean_8_reader", "code_39_reader"]
+            readers: ["code_128_reader", "ean_reader", "code_39_reader"]
         },
-        locate: true,  // Activer la détection automatique de localisation du code-barres
-        locator: {
-            halfSample: true,
-            patchSize: "medium",  // Taille moyenne pour l'algorithme de localisation
-            debug: {
-                showCanvas: false,
-                showPatches: false,
-                showFoundPatches: false,
-                showSkeleton: false
-            }
-        }
+        locate: true  // Activer la localisation automatique du code-barres
     }, function(err) {
         if (err) {
             console.log(err);
@@ -36,12 +24,12 @@ document.getElementById('scanBtn').addEventListener('click', function() {
     Quagga.onDetected(function(result) {
         let code = result.codeResult.code;
         document.getElementById('barcodeResult').innerText = "Code-barres scanné : " + code;
-        searchCSV(code);
-        Quagga.stop();  // Arrêter le scan après détection
+        searchCSV(code);  // Recherche dans le CSV après scan
+        Quagga.stop();  // Arrêter le scan une fois le code-barres détecté
     });
 });
 
-// Fonction pour rechercher un terme dans le CSV et afficher les informations
+// Fonction de recherche dans le CSV pour afficher les résultats formatés
 function searchCSV(term) {
     if (!window.csvData) {
         document.getElementById('csvResult').innerText = "Veuillez d'abord sélectionner un fichier CSV.";
@@ -52,8 +40,7 @@ function searchCSV(term) {
     let found = false;
     let resultContent = "";
 
-    // Recherche du terme dans le CSV
-    for (let i = 1; i < window.csvData.length; i++) {  // Ignorer la première ligne d'en-tête
+    for (let i = 1; i < window.csvData.length; i++) {
         let row = window.csvData[i];
         if (row.some(col => col.toString().toLowerCase().includes(term.toLowerCase()))) {
             found = true;
@@ -68,11 +55,10 @@ function searchCSV(term) {
         }
     }
 
-    // Afficher le résultat formaté
     document.getElementById('csvResult').innerHTML = found ? resultContent : result;
 }
 
-// Gestionnaire pour la saisie manuelle du terme à rechercher
+// Gestionnaire de la saisie manuelle
 document.getElementById('searchBtn').addEventListener('click', function() {
     const searchTerm = document.getElementById('manualBarcode').value;
     if (searchTerm) {
@@ -82,7 +68,7 @@ document.getElementById('searchBtn').addEventListener('click', function() {
     }
 });
 
-// Fonction pour lire le fichier CSV sélectionné
+// Fonction pour lire un fichier CSV sélectionné
 document.getElementById('csvFileInput').addEventListener('change', function(event) {
     let file = event.target.files[0];
     if (file) {
@@ -90,17 +76,16 @@ document.getElementById('csvFileInput').addEventListener('change', function(even
     }
 });
 
-// Fonction pour charger un fichier CSV
+// Fonction pour charger le CSV
 function loadCSV(file) {
     Papa.parse(file, {
         complete: function(results) {
-            console.log("Données CSV:", results.data);
-            window.csvData = results.data;  // Stocker les données CSV dans une variable globale
+            window.csvData = results.data;
         }
     });
 }
 
-// Charger un fichier CSV par défaut (glpi.csv) si aucun fichier n'est fourni
+// Charger un CSV par défaut au démarrage si aucun fichier n'est sélectionné
 window.onload = function() {
     if (!window.csvData) {
         fetch('glpi.csv')
@@ -108,7 +93,6 @@ window.onload = function() {
             .then(csvText => {
                 Papa.parse(csvText, {
                     complete: function(results) {
-                        console.log("Données CSV par défaut chargées:", results.data);
                         window.csvData = results.data;
                     }
                 });
