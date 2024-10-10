@@ -25,6 +25,23 @@
         <div id="csvResult"></div>
     </div>
 
+    <button id="testCam">Tester caméra</button>
+    <video id="video" width="300" height="200" autoplay></video>
+
+    <script>
+    document.getElementById('testCam').addEventListener('click', function() {
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function(stream) {
+                document.getElementById('video').srcObject = stream;
+                alert("Caméra activée avec succès !");
+            })
+            .catch(function(err) {
+                console.error("Erreur lors de l'accès à la caméra :", err);
+                alert("Erreur : Accès à la caméra refusé.");
+            });
+    });
+    </script>
+
     <!-- Script pour ZXing (en utilisant leur bibliothèque de scanner) -->
     <script src="https://unpkg.com/@zxing/library@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
