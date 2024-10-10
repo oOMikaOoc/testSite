@@ -1,5 +1,6 @@
 // Fonction pour démarrer le scan de code-barres avec ZXing
 document.getElementById('scanBtn').addEventListener('click', function() {
+    alert("Périphériques vidéo détectés : " + JSON.stringify(videoInputDevices));
     // Demander explicitement l'accès à la caméra
     navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
         const codeReader = new ZXing.BrowserBarcodeReader();
