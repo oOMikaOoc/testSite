@@ -1,35 +1,29 @@
 // Fonction pour démarrer le scan de code-barres avec ZXing
 document.getElementById('scanBtn').addEventListener('click', function() {
-    // Demander explicitement l'accès à la caméra
-    navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
-        const codeReader = new ZXing.BrowserBarcodeReader();
+    const codeReader = new ZXing.BrowserBarcodeReader();
 
-        // Récupérer les périphériques vidéo
-        codeReader.getVideoInputDevices().then(videoInputDevices => {
-            if (videoInputDevices.length > 0) {
-                // Afficher les périphériques vidéo détectés
-                alert("Périphériques vidéo détectés : " + JSON.stringify(videoInputDevices));
-                
-                const firstDeviceId = videoInputDevices[0].deviceId;
+    // Demander les périphériques vidéo
+    codeReader.getVideoInputDevices().then(videoInputDevices => {
+        if (videoInputDevices.length > 0) {
+            const firstDeviceId = videoInputDevices[0].deviceId;
 
-                // Utiliser la première caméra détectée
-                codeReader.decodeOnceFromVideoDevice(firstDeviceId, 'barcodeScannerArea').then(result => {
-                    document.getElementById('barcodeResult').innerText = "Code-barres scanné : " + result.text;
-                    searchCSV(result.text);  // Recherche dans le CSV après le scan
-                }).catch(err => console.error("Erreur lors du scan :", err));
-            } else {
-                alert("Aucun périphérique vidéo trouvé.");
-                document.getElementById('barcodeResult').innerText = "Erreur : Aucun périphérique vidéo trouvé.";
-            }
-        }).catch(err => {
-            console.error("Erreur lors de la récupération des périphériques vidéo :", err);
-            document.getElementById('barcodeResult').innerText = "Erreur : Récupération des périphériques vidéo échouée.";
-        });
-    }).catch(function(err) {
-        console.error("Accès à la caméra refusé :", err);
-        document.getElementById('barcodeResult').innerText = "Erreur : Accès à la caméra refusé ou aucun périphérique trouvé.";
+            // Test du scan avec la première caméra détectée
+            codeReader.decodeOnceFromVideoDevice(firstDeviceId, 'barcodeScannerArea').then(result => {
+                document.getElementById('barcodeResult').innerText = "Code-barres scanné : " + result.text;
+                searchCSV(result.text);  // Recherche dans le CSV après le scan
+            }).catch(err => {
+                console.error("Erreur lors du scan :", err);
+                alert("Erreur lors du scan du code-barres.");
+            });
+        } else {
+            alert("Aucun périphérique vidéo trouvé.");
+        }
+    }).catch(err => {
+        console.error("Erreur lors de la récupération des périphériques vidéo :", err);
+        alert("Erreur lors de l'accès aux périphériques vidéo.");
     });
 });
+
 
 
 
