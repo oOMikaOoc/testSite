@@ -19,25 +19,12 @@ document.getElementById('scanBtn').addEventListener('click', function() {
 
     Quagga.onDetected(function(result) {
         let code = result.codeResult.code;
-        document.getElementById('barcodeResult').innerText = "Code-barres: " + code;
+        document.getElementById('barcodeResult').innerText = "Code-barres scanné : " + code;
         searchCSV(code);
     });
 });
 
-// Fonction pour lire le fichier CSV sélectionné
-document.getElementById('csvFileInput').addEventListener('change', function(event) {
-    let file = event.target.files[0];
-    if (file) {
-        Papa.parse(file, {
-            complete: function(results) {
-                console.log("Données CSV:", results.data);
-                window.csvData = results.data;  // Stocker les données CSV dans une variable globale
-            }
-        });
-    }
-});
-
-// Fonction pour rechercher dans le CSV avec le code-barres scanné
+// Fonction pour rechercher dans le CSV à partir du code-barres scanné ou saisi
 function searchCSV(barcode) {
     if (!window.csvData) {
         document.getElementById('csvResult').innerText = "Veuillez d'abord sélectionner un fichier CSV.";
@@ -53,3 +40,27 @@ function searchCSV(barcode) {
     }
     document.getElementById('csvResult').innerText = result;
 }
+
+// Gestionnaire pour la saisie manuelle du code-barres
+document.getElementById('searchBtn').addEventListener('click', function() {
+    const manualBarcode = document.getElementById('manualBarcode').value;
+    if (manualBarcode) {
+        document.getElementById('barcodeResult').innerText = "Code-barres saisi : " + manualBarcode;
+        searchCSV(manualBarcode);
+    } else {
+        alert("Veuillez entrer un code-barres.");
+    }
+});
+
+// Fonction pour lire le fichier CSV sélectionné
+document.getElementById('csvFileInput').addEventListener('change', function(event) {
+    let file = event.target.files[0];
+    if (file) {
+        Papa.parse(file, {
+            complete: function(results) {
+                console.log("Données CSV:", results.data);
+                window.csvData = results.data;  // Stocker les données CSV dans une variable globale
+            }
+        });
+    }
+});
