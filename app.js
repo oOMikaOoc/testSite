@@ -1,37 +1,21 @@
-// Fonction pour démarrer le scan de code-barres
+// Fonction pour démarrer le scan de code-barres avec ZXing
 document.getElementById('scanBtn').addEventListener('click', function() {
-    Quagga.init({
-        inputStream: {
-            name: "Live",
-            type: "LiveStream",
-            target: document.querySelector('#barcodeScannerArea'),
-            constraints: {
-                facingMode: "environment"  // Utiliser la caméra arrière pour une meilleure qualité de scan
-            }
-        },
-        decoder: {
-            readers: ["code_128_reader", "ean_reader", "code_39_reader"]
-        },
-        locate: true  // Activer la localisation automatique du code-barres
-    }, function(err) {
-        if (err) {
-            console.log(err);
-            return;
-        }
-        Quagga.start();
-    });
+    const codeReader = new ZXing.BrowserBarcodeReader();
+    codeReader.getVideoInputDevices().then(videoInputDevices => {
+        const firstDeviceId = videoInputDevices[0].deviceId;
 
-    Quagga.onDetected(function(result) {
-        let code = result.codeResult.code;
-        document.getElementById('barcodeResult').innerText = "Code-barres scanné : " + code;
-        searchCSV(code);  // Recherche dans le CSV après scan
-        Quagga.stop();  // Arrêter le scan une fois le code-barres détecté
+        // Utiliser la première caméra trouvée (ou arrière sur mobile)
+        codeReader.decodeOnceFromVideoDevice(firstDeviceId, 'barcodeScannerArea').then(result => {
+            document.getElementById('barcodeResult').innerText = "Code-barres scanné : " + result.text;
+            searchCSV(result.text);  // Recherche dans le CSV après le scan
+        }).catch(err => console.error(err));
     });
 });
 
 // Fonction de recherche dans le CSV pour afficher les résultats formatés
 function searchCSV(term) {
-    if (!window.csvData) {
+
+    if (!window.csvData || window.csvData.length === 0) {
         document.getElementById('csvResult').innerText = "Veuillez d'abord sélectionner un fichier CSV.";
         return;
     }
@@ -68,34 +52,54 @@ document.getElementById('searchBtn').addEventListener('click', function() {
     }
 });
 
-// Fonction pour lire un fichier CSV sélectionné
+// Fonction pour lire le fichier CSV sélectionné ou charger un fichier par défaut
 document.getElementById('csvFileInput').addEventListener('change', function(event) {
     let file = event.target.files[0];
     if (file) {
-        loadCSV(file);
+        loadCSV(file);  // Appel de la fonction pour charger le fichier CSV
     }
 });
 
-// Fonction pour charger le CSV
+// Fonction pour charger un fichier CSV
 function loadCSV(file) {
+    console.log("Chargement du fichier CSV :", file);  // Vérification que le fichier est bien passé à PapaParse
+
     Papa.parse(file, {
         complete: function(results) {
-            window.csvData = results.data;
-        }
+            if (results.data.length > 0) {
+                window.csvData = results.data;  // Stocker les données CSV dans une variable globale
+                document.getElementById('barcodeResult').innerText = "Fichier CSV chargé avec succès.";
+            } else {
+                document.getElementById('barcodeResult').innerText = "Erreur : Les données CSV sont vides.";
+            }
+        },
+        error: function(error) {
+            document.getElementById('barcodeResult').innerText = "Erreur lors du chargement du CSV.";
+        },
+        header: false  // Désactiver l'option d'en-tête pour conserver toutes les lignes
     });
 }
 
-// Charger un CSV par défaut au démarrage si aucun fichier n'est sélectionné
+// Charger un fichier CSV par défaut (glpi.csv) si aucun fichier n'est fourni
 window.onload = function() {
-    if (!window.csvData) {
-        fetch('glpi.csv')
-            .then(response => response.text())
-            .then(csvText => {
-                Papa.parse(csvText, {
-                    complete: function(results) {
+    fetch('glpi.csv')
+        .then(response => response.text())
+        .then(csvText => {
+            Papa.parse(csvText, {
+                complete: function(results) {
+                    console.log("CSV par défaut chargé :", results.data);
+                    if (results.data.length > 0) {
                         window.csvData = results.data;
+                        document.getElementById('barcodeResult').innerText = "Fichier glpi.csv par défaut chargé.";
+                    } else {
+                        document.getElementById('barcodeResult').innerText = "Erreur : Les données CSV par défaut sont vides.";
                     }
-                });
+                },
+                error: function(error) {
+                    console.error("Erreur lors du chargement du CSV par défaut :", error);
+                },
+                header: false  // Désactiver l'option d'en-tête pour conserver toutes les lignes
             });
-    }
+        })
+        .catch(error => console.error("Erreur lors de la récupération du fichier CSV par défaut :", error));
 };

@@ -4,62 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scan et Recherche CSV</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-        }
-
-        .container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            text-align: center;
-        }
-
-        h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-
-        button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 10px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        input[type="text"], input[type="file"] {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-
-        #barcodeScannerArea {
-            width: 100%;
-            height: 300px;
-            background-color: #ccc;
-            border: 1px solid #aaa;
-            margin-top: 10px;
-        }
-
-        #csvResult {
-            margin-top: 20px;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">  <!-- Lien vers le fichier CSS -->
 </head>
 <body>
     <div class="container">
@@ -71,18 +16,19 @@
         <!-- Recherche manuelle -->
         <input type="text" id="manualBarcode" placeholder="Entrez un code-barres ou terme">
         <button id="searchBtn">Rechercher</button>
+        <br>
+        <!-- Interface de scan avec ZXing -->
+        <button id="scanBtn">Scanner avec ZXing</button>
+        <p id="barcodeResult">Code-barres scanné ou saisi: </p>
 
-        <!-- Zone de scan -->
-        <div id="barcodeScannerArea"></div>
-        <button id="scanBtn">Scanner le code-barres</button>
-        <p id="barcodeResult"></p>
-
-        <!-- Résultats -->
+        <!-- Zone d'affichage des résultats -->
         <div id="csvResult"></div>
     </div>
 
-    <script src="https://unpkg.com/quagga@0.12.1/dist/quagga.min.js"></script>
+    <!-- Script pour ZXing (en utilisant leur bibliothèque de scanner) -->
+    <script src="https://unpkg.com/@zxing/library@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="app.js"></script>
+
 </body>
 </html>
